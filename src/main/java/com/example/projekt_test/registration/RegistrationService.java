@@ -35,9 +35,9 @@ public class RegistrationService {
         );
     }
 
-    @Transactional
-    public String confirmToken(String token) {
-        //ConfirmationToken confirmationToken = confirmationTokenService.
-        return "";//TODO
-    }
+//    @Transactional
+//    public String confirmToken(String token) {
+//        ConfirmationToken confirmationToken = confirmationTokenService
+//                .
+//    }
 }
