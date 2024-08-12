@@ -1,6 +1,6 @@
 package com.example.projekt_test.appUser;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.util.Collection;
 import java.util.Collections;
 

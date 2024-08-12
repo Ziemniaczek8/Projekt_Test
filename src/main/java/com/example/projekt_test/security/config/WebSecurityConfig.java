@@ -1,47 +1,106 @@
 package com.example.projekt_test.security.config;
 
+//import com.example.projekt_test.appUser.AppUserService;
+
 import com.example.projekt_test.appUser.AppUserService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@AllArgsConstructor
+//@AllArgsConstructor
+//@RequiredArgsConstructor
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
-    private final AppUserService appUserService;
+    //    private final AppUserService appUserService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()  //mozna wysylac POST request bez bycia odrzuconym // disable tylko tymczasowo
-                .authorizeRequests()
-                   .antMatchers("/api/v*/registration/**") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-                   .permitAll()
-                .anyRequest()  //kazdy request
-                .authenticated().and()  // musi zostac autentykowany
-                .formLogin();
-
+    public WebSecurityConfig(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(daoAuthenticationProvider());
+//    @Bean
+//    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+////                .csrf().disable()  //mozna wysylac POST request bez bycia odrzuconym // disable tylko tymczasowo
+//                .authorizeHttpRequests(req -> req.requestMatchers("/", "index").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                        .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                        .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                        .anyRequest()  //kazdy request
+//                        .authenticated())  // musi zostac autentykowany
+//                .formLogin(
+//                        form -> form.loginPage("/login").permitAll()
+//                )
+//                .logout(
+//                        logout -> logout.permitAll().logoutSuccessUrl("/login?logout"));
+//        return http.build();
+//    }
+
+//    @Bean
+//    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests(req -> req.requestMatchers("/", "index").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                       .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                      .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+//                        .anyRequest()  //kazdy request
+//                       .authenticated())
+//                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+//                .logout(LogoutConfigurer::permitAll);
+//
+//        return http.build();
+//    }
+
+    @Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .authorizeHttpRequests(req -> req.requestMatchers("/", "index").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+                        .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+                        .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+                        .anyRequest()  //kazdy request
+                        .authenticated());
+        return http.build();
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(bCryptPasswordEncoder);
-        provider.setUserDetailsService(appUserService);
-        return provider;
+    public UserDetailsService userDetailsService() {
+        UserDetails api = User.builder()
+                .username("api")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .roles("API")
+                .build();
+
+        UserDetails kartofel = User.builder()
+                .username("kartofel")
+                .password(bCryptPasswordEncoder.encode("123456"))
+                .roles("KARTOFEL")
+                .build();
+
+        return new InMemoryUserDetailsManager(api, kartofel);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }
