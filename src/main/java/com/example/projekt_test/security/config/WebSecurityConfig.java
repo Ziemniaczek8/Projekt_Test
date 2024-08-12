@@ -23,6 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()  //mozna wysylac POST request bez bycia odrzuconym // disable tylko tymczasowo
+                .antMatcher("index.html")
                 .authorizeRequests()
                    .antMatchers("/api/v*/registration/**") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                    .permitAll()
