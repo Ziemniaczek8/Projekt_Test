@@ -21,6 +21,6 @@ public class JwtConfig {
     }
 
     public long getTokenExpirationAfterDays() {
-        return 16L * 24L * 60L * 60L * 1000L;
+        return tokenExpiration;
     }
 }
