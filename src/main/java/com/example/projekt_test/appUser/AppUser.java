@@ -82,14 +82,6 @@ public class AppUser implements UserDetails {
         return password;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
     @Override
     public String getUsername() {
         return email;
