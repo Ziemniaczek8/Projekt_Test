@@ -1,23 +1,17 @@
 package com.example.projekt_test.security.config;
 
-//import com.example.projekt_test.appUser.AppUserService;
 
-import com.example.projekt_test.appUser.AppUserService;
 import com.example.projekt_test.jwt.JwtConfig;
 import com.example.projekt_test.jwt.JwtTokenVerifier;
 import com.example.projekt_test.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,59 +24,24 @@ import javax.crypto.SecretKey;
 
 @Configuration
 @AllArgsConstructor
-//@RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    //    private final AppUserService appUserService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
-    //private final AuthenticationManager authenticationManager;
-    private final AuthenticationConfiguration authenticationConfiguration;
-
-
-//    @Bean
-//    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-////                .csrf().disable()  //mozna wysylac POST request bez bycia odrzuconym // disable tylko tymczasowo
-//                .authorizeHttpRequests(req -> req.requestMatchers("/", "index").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                        .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                        .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                        .anyRequest()  //kazdy request
-//                        .authenticated())  // musi zostac autentykowany
-//                .formLogin(
-//                        form -> form.loginPage("/login").permitAll()
-//                )
-//                .logout(
-//                        logout -> logout.permitAll().logoutSuccessUrl("/login?logout"));
-//        return http.build();
-//    }
-
-//    @Bean
-//    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(req -> req.requestMatchers("/", "index").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                       .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                      .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
-//                        .anyRequest()  //kazdy request
-//                       .authenticated())
-//                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
-//                .logout(LogoutConfigurer::permitAll);
-//
-//        return http.build();
-//    }
 
     @Bean
-    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authConfig) throws Exception {
+        AuthenticationManager authenticationManager = authConfig.getAuthenticationManager();
         http.csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), secretKey, jwtConfig))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager, secretKey, jwtConfig))
                 .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
 
-                .authorizeHttpRequests(req -> req.requestMatchers("/", "index.html", "login", "login**").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+                .authorizeHttpRequests(req -> req.requestMatchers("/", "index.html", "login", "login/**").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .anyRequest()  //kazdy request

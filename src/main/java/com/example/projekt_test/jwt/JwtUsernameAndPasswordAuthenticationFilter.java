@@ -20,15 +20,17 @@ import java.time.LocalDate;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
 
-    public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager,
-                                                      SecretKey secretKey,
-                                                      JwtConfig jwtConfig) {
-
+    public JwtUsernameAndPasswordAuthenticationFilter(
+//            AuthenticationManager authenticationManager,
+            AuthenticationManager authenticationManager, SecretKey secretKey,
+            JwtConfig jwtConfig) {
         this.authenticationManager = authenticationManager;
+
+//        this.authenticationManager = authenticationManager;
         this.secretKey = secretKey;
         this.jwtConfig = jwtConfig;
     }
