@@ -3,6 +3,9 @@ package com.example.projekt_test.security.config;
 //import com.example.projekt_test.appUser.AppUserService;
 
 import com.example.projekt_test.appUser.AppUserService;
+import com.example.projekt_test.jwt.JwtConfig;
+import com.example.projekt_test.jwt.JwtTokenVerifier;
+import com.example.projekt_test.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,18 +26,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import javax.crypto.SecretKey;
+
 @Configuration
-//@AllArgsConstructor
+@AllArgsConstructor
 //@RequiredArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
 
     //    private final AppUserService appUserService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
+    //private final AuthenticationManager authenticationManager;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
-    public WebSecurityConfig(BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
 //    @Bean
 //    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,6 +79,8 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
 
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), secretKey, jwtConfig))
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtUsernameAndPasswordAuthenticationFilter.class)
 
                 .authorizeHttpRequests(req -> req.requestMatchers("/", "index.html", "login", "login**").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
@@ -99,8 +107,4 @@ public class WebSecurityConfig {
         return new InMemoryUserDetailsManager(api, kartofel);
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
 }
