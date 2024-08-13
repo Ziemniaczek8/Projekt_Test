@@ -74,7 +74,7 @@ public class WebSecurityConfig {
 
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .authorizeHttpRequests(req -> req.requestMatchers("/", "index.html","login","style.css").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
+                .authorizeHttpRequests(req -> req.requestMatchers("/", "index.html","login","style.css","contact.html").permitAll() // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .requestMatchers("/api/**").hasRole("API")// kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .requestMatchers("/kartofel/**").hasRole("KARTOFEL") // kazdy request ktory przejdzie przez ten endpoint, zostanie puszczony
                         .anyRequest()  //kazdy request
