@@ -1,10 +1,8 @@
 package com.example.projekt_test.registration;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
+@Builder
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode

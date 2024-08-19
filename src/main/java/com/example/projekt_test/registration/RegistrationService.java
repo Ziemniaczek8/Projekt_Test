@@ -1,11 +1,16 @@
 package com.example.projekt_test.registration;
 
 import com.example.projekt_test.appUser.AppUser;
+import com.example.projekt_test.appUser.AppUserRepository;
 import com.example.projekt_test.appUser.AppUserRole;
 import com.example.projekt_test.appUser.AppUserService;
+import com.example.projekt_test.mappers.AppUserMapper;
 import com.example.projekt_test.registration.token.ConfirmationToken;
 import com.example.projekt_test.registration.token.ConfirmationTokenService;
+import com.example.projekt_test.utils.ValidationUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,26 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegistrationService {
 
     private final AppUserService appUserService;
-    private final EmailValidator emailValidator;
+    private final AppUserRepository appUserRepository;
     private final ConfirmationTokenService confirmationTokenService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AppUserMapper appUserMapper;
 
-    //rejestrowanie: sprawdzamy czy email jest valid
-    public String register(RegistrationRequest request) {
-        boolean isValidEmail = emailValidator.test(request.getEmail());
 
-        if (!isValidEmail) {
-            throw new IllegalStateException(request.getEmail() + " is not a valid email address");
-        }
-        return appUserService.signUpUser(
-                new AppUser(
-                        request.getFirstName(),
-                        request.getLastName(),
-                        request.getEmail(),
-                        request.getPassword(),
-                        AppUserRole.USER
-                )
-        );
-    }
+    /*public String register(RegistrationRequest request) {
+
+
+    }*/
 
 //    @Transactional
 //    public String confirmToken(String token) {

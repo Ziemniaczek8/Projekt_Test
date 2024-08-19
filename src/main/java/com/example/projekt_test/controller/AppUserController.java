@@ -1,20 +1,22 @@
-package com.example.projekt_test.registration;
+package com.example.projekt_test.controller;
 
+import com.example.projekt_test.appUser.AppUserService;
+import com.example.projekt_test.registration.RegistrationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("api/v1/registration")
 @AllArgsConstructor
-public class RegistrationController {
+@RestController
+@RequestMapping("/registration")
+public class AppUserController {
 
-    private RegistrationService registrationService;
+    private final AppUserService appUserService;
 
     @PostMapping
     public String register(@RequestBody RegistrationRequest request) {
-        return registrationService.register(request);
+        return appUserService.saveUser(request);
     }
 }

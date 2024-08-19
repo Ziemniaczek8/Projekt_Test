@@ -13,3 +13,5 @@ public class JwtAuthenticationManager {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+
+
